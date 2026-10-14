@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Build;
 
 import java.util.Calendar;
+import java.util.TimeZone;
 
 public class ReminderScheduler {
 
@@ -16,8 +17,10 @@ public class ReminderScheduler {
     private static final int REQUEST_CODE = 1001;
 
     // Heure du rappel quotidien (modifiable ici, format 24h)
-    private static final int REMINDER_HOUR = 18;
+    private static final int REMINDER_HOUR = 17;
     private static final int REMINDER_MINUTE = 0;
+    private static final TimeZone REMINDER_TIME_ZONE =
+            TimeZone.getTimeZone("America/Port-au-Prince");
 
     public static void createNotificationChannel(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -54,7 +57,7 @@ public class ReminderScheduler {
     }
 
     static long nextTriggerTime() {
-        Calendar calendar = Calendar.getInstance();
+        Calendar calendar = Calendar.getInstance(REMINDER_TIME_ZONE);
         calendar.set(Calendar.HOUR_OF_DAY, REMINDER_HOUR);
         calendar.set(Calendar.MINUTE, REMINDER_MINUTE);
         calendar.set(Calendar.SECOND, 0);
