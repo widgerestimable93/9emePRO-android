@@ -23,7 +23,7 @@ import android.content.Context;
 
 public class MainActivity extends Activity {
 
-    private static final String GAS_URL = "https://script.google.com/macros/s/AKfycbwTnQK4MHIulnKL7V_9t-5vqAgsPz8VNM_SqgCt6zUYgjKlT8fpS-nBQvaHpOjY063X/exec";
+    private static final String APP_URL = "https://widgerestimable93.github.io/9emePRO/";
 
     private WebView webView;
     private ProgressBar progressBar;
@@ -100,11 +100,28 @@ public class MainActivity extends Activity {
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                String url = request.getUrl().toString();
-                if (url.contains("script.google.com") || url.contains("accounts.google.com")) {
+                Uri uri = request.getUrl();
+                String scheme = uri.getScheme();
+                String host = uri.getHost();
+
+                // Keep the app and its authentication redirects inside the WebView.
+                if ("https".equalsIgnoreCase(scheme)
+                        && host != null
+                        && (host.equals("github.io")
+                            || host.endsWith(".github.io")
+                            || host.equals("github.com")
+                            || host.endsWith(".github.com")
+                            || host.equals("google.com")
+                            || host.endsWith(".google.com")
+                            || host.equals("googleusercontent.com")
+                            || host.endsWith(".googleusercontent.com")
+                            || host.equals("googleapis.com")
+                            || host.endsWith(".googleapis.com"))) {
                     return false;
                 }
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+
+                // Open unrelated external links in the browser.
+                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                 startActivity(intent);
                 return true;
             }
@@ -117,10 +134,10 @@ public class MainActivity extends Activity {
             }
 
             @Override
-            public void onReceivedError(WebView view, int errorCode,
-                                        String description, String failingUrl) {
-                super.onReceivedError(view, errorCode, description, failingUrl);
-                if (!isConnected()) {
+            public void onReceivedError(WebView view, WebResourceRequest request,
+                                        android.webkit.WebResourceError error) {
+                super.onReceivedError(view, request, error);
+                if (request.isForMainFrame()) {
                     webView.setVisibility(View.GONE);
                     offlineLayout.setVisibility(View.VISIBLE);
                 }
@@ -136,7 +153,7 @@ public class MainActivity extends Activity {
         }
         offlineLayout.setVisibility(View.GONE);
         webView.setVisibility(View.VISIBLE);
-        webView.loadUrl(GAS_URL);
+        webView.loadUrl(APP_URL);
     }
 
     private boolean isConnected() {
