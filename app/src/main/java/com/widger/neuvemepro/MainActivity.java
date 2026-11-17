@@ -5,8 +5,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -19,7 +17,6 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.content.Context;
 
 public class MainActivity extends Activity {
 
@@ -146,21 +143,11 @@ public class MainActivity extends Activity {
     }
 
     private void loadApp() {
-        if (!isConnected()) {
-            webView.setVisibility(View.GONE);
-            offlineLayout.setVisibility(View.VISIBLE);
-            return;
-        }
+        // Always let the PWA service worker handle the navigation. When offline,
+        // it can return the cached app shell instead of being blocked natively.
         offlineLayout.setVisibility(View.GONE);
         webView.setVisibility(View.VISIBLE);
         webView.loadUrl(APP_URL);
-    }
-
-    private boolean isConnected() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (cm == null) return false;
-        NetworkInfo net = cm.getActiveNetworkInfo();
-        return net != null && net.isConnected();
     }
 
     @Override
